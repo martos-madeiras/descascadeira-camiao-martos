@@ -125,6 +125,9 @@ def analyze_data(dados_lidos, key_suffix):
     st.write(f"**Data de Início:** {dados_lidos['data_inicio']} {dados_lidos['hora_inicio']}")
     st.write(f"**Data de Fim:** {dados_lidos['data_fim']} {dados_lidos['hora_fim']}")
     
+    total_troncos = df_troncos['Quantidade'].astype(int).sum()
+    st.write(f"**Total de Troncos:** {total_troncos}")
+    
     # Exibir os dois valores adicionais
     st.write(f"**Valor 1:** {dados_lidos['valor_1']}")
     st.write(f"**Valor 2:** {dados_lidos['valor_2']}")

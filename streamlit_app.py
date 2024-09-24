@@ -165,16 +165,21 @@ with tab1:
         df = analyze_data(dados_lidos, "upload")
         
         output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            df.to_excel(writer, index_label='Linha', sheet_name='Sheet1')
-        excel_data = output.getvalue()
-        st.download_button(
-            label="Download Excel",
-            data=excel_data,
-            file_name=f"{uploaded_file.name.replace('.txt', '.xlsx')}",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            key=f"download_new_file"
-        )
+if not df.empty:
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index_label='Linha', sheet_name='Sheet1')
+    excel_data = output.getvalue()
+    
+    # Botão de download apenas se houver dados
+    st.download_button(
+        label="Download Excel",
+        data=excel_data,
+        file_name=f"{uploaded_file.name.replace('.txt', '.xlsx')}",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        key=f"download_new_file"
+    )
+else:
+    st.warning("O DataFrame está vazio. Não há dados para exportar para Excel.")
 
 with tab2:
     st.header("Arquivos")

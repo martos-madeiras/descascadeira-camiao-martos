@@ -64,86 +64,80 @@ def delete_file(filename):
         return True
     return False
 
+# Função atualizada para ler ficheiros com novo formato
 def ler_ficheiro_txt(file):
-    dados = []
+    # Inicializar variáveis
+    dados_troncos = []
+    metadados = {}
+
+    # Ler o conteúdo do ficheiro
     content = file.getvalue().decode('utf-8')
-    for linha in content.split('\n'):
+    linhas = content.split('\n')
+
+    # Primeira linha: datas e horas
+    primeira_linha = linhas[0].strip().split('~')
+    data_inicio, hora_inicio, data_fim, hora_fim = primeira_linha
+
+    # Segunda linha: valores numéricos
+    segunda_linha = linhas[1].strip().split('~')
+    valor_1, valor_2 = segunda_linha[:2]  # Aqui temos dois valores
+
+    # Linhas de troncos (a partir da terceira linha até encontrar metadados)
+    for linha in linhas[2:]:
         linha = linha.strip()
-        if linha:
-            colunas = linha.split('~')
-            dados.append(colunas)
-    return dados
+        if not linha or ":" in linha:
+            # Parar ao encontrar uma linha que contém metadados (contém ":")
+            break
+        colunas = linha.split('~')
+        if len(colunas) >= 3:
+            dados_troncos.append(colunas[:3])
 
-def analyze_data(dados_lidos, key_suffix):
-    nomes_colunas = ['Data', 'Hora', 'Série', 'N.º Tronco', 'D min', 'D méd', 'D máx', 'Comprimento', 'a','Box', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'q', 'w','e','r','t','y','u','i','o','p']
+    # Metadados (linhas com ":")
+    for linha in linhas[len(dados_troncos) + 2:]:
+        if ":" in linha:
+            chave, valor = linha.split(":")
+            metadados[chave.strip()] = valor.strip()
 
-    df = pd.DataFrame(dados_lidos, columns=nomes_colunas[:len(dados_lidos[0])])
-    df.index = df.index + 1
-    df['Box'] = pd.to_numeric(df['Box'], errors='coerce')
-
-    st.dataframe(df)
-
-    total_ntronco = df['N.º Tronco'].count()
-
-    lst_horas = pd.to_datetime(df['Hora'], format='%H:%M:%S')
-
-    total_nsegundos = (lst_horas[total_ntronco] - lst_horas[1]).total_seconds()-3600
-    total_nhoras, remainder = divmod(total_nsegundos, 3600)
-    total_nminutos, total_nsegundos = divmod(remainder, 60)
-
-    total_nhoras = int(total_nhoras)
-    total_nminutos = int(total_nminutos)
-    total_nsegundos = int(total_nsegundos)
-    tempo_total_min = (total_nhoras * 60) + total_nminutos +  (total_nsegundos / 60)
-    quantidade_min = total_ntronco /  tempo_total_min
-
-    if 'Data' in df.columns:
-        df['Data'] = pd.to_datetime(df['Data'], errors='coerce')
-        data_analise = df['Data'].max()
-        data_analise_str = data_analise.strftime('%Y-%m-%d') if pd.notna(data_analise) else 'Data não disponível'
-    else:
-        data_analise_str = 'Data não disponível'
-    
-    cor_texto = "rgb(194, 97, 30)"
-    st.markdown(f'**Periodo da análise**: <span style="color:{cor_texto}; font-weight:bold;">{data_analise_str}</span>', unsafe_allow_html=True)
-    st.markdown(f'**Quantidade Produzida**: <span style="color:{cor_texto}; font-weight:bold;">{total_ntronco}</span>', unsafe_allow_html=True)
-    st.markdown(f'**Tempo total de trabalho**: <span style="color:{cor_texto}; font-weight:bold;">{total_nhoras}h:{total_nminutos}min:{total_nsegundos}seg</span>', unsafe_allow_html=True)
-    st.markdown(f'**Quantidade por minuto**: <span style="color:{cor_texto}; font-weight:bold;">{quantidade_min:.2f} troncos/minuto</span>', unsafe_allow_html=True)
-   
-    box_descriptions = {
-        1: "2200 M",
-        2: "metal",
-        3: "2200 G",
-        4: "2200 F",
-        5: "2500 M",
-        6: "2500 F",
-        7: "2500 G",
-        8: "2650",
-        9: "2800 G",
-        10: "2800 F/M",
-        11: "3100 G",
-        12: "3100 F/M",
-        13: "Outros",
+    return {
+        "data_inicio": data_inicio,
+        "hora_inicio": hora_inicio,
+        "data_fim": data_fim,
+        "hora_fim": hora_fim,
+        "valor_1": valor_1,
+        "valor_2": valor_2,
+        "dados_troncos": dados_troncos,
+        "metadados": metadados
     }
-    contagem = df['Box'].value_counts().sort_index()
-    contagem_df = contagem.to_frame().reset_index()
-    contagem_df.columns = ['Box', 'Quantidade']
 
-    contagem_df['Descrição'] = contagem_df['Box'].map(box_descriptions).fillna('Descrição não disponível')
+# Função de análise adaptada
+def analyze_data(dados_lidos, key_suffix):
+    # Exibir informações de data e hora
+    st.write(f"**Data de Início:** {dados_lidos['data_inicio']} {dados_lidos['hora_inicio']}")
+    st.write(f"**Data de Fim:** {dados_lidos['data_fim']} {dados_lidos['hora_fim']}")
     
-    st.subheader("N.º de Troncos por cada Box:")
-    st.dataframe(contagem_df.sort_values(by='Box'))
+    # Exibir os dois valores adicionais
+    st.write(f"**Valor 1:** {dados_lidos['valor_1']}")
+    st.write(f"**Valor 2:** {dados_lidos['valor_2']}")
 
-    box_filtrar = st.number_input("Apresentar registos detalhados para a Box n.º :", min_value=0, max_value=13, step=1, key=f"box_filter_{key_suffix}")
-    
-    troncos_box_filtrados = df[df['Box'] == box_filtrar]
-    if not troncos_box_filtrados.empty:
-        st.dataframe(troncos_box_filtrados)
-    elif box_filtrar != 0:
-        st.write(f"Nenhum tronco encontrado na Box {box_filtrar}.")
+    # Converter dados dos troncos em DataFrame
+    colunas_troncos = ['Nº Tronco', 'Quantidade', 'Medida']
+    df_troncos = pd.DataFrame(dados_lidos['dados_troncos'], columns=colunas_troncos)
 
-    return df
+    # Exibir DataFrame dos troncos
+    st.subheader("Dados dos Troncos")
+    st.dataframe(df_troncos)
 
+    # Exibir metadados
+    st.subheader("Metadados")
+    for chave, valor in dados_lidos['metadados'].items():
+        st.write(f"**{chave}:** {valor}")
+
+    # Cálculos adicionais podem ser feitos com os dados do DataFrame `df_troncos`
+    # por exemplo, sumarizar a quantidade total de troncos
+    total_troncos = df_troncos['Quantidade'].astype(int).sum()
+    st.write(f"**Total de Troncos:** {total_troncos}")
+
+# Estrutura de tabs e funcionalidade
 st.title('Dashboard - Descascadeira')
 
 tab1, tab2 = st.tabs(["Carregar Novo Ficheiro", "Arquivo de Ficheiros"])
@@ -178,14 +172,11 @@ with tab2:
     existing_files = load_existing_files()
     
     if existing_files:
-        
-    
         selected_file = st.selectbox(
             "Selecione um ficheiro do arquivo:",
             list(existing_files.keys()),
             key="file_selector"
         )
-    
     
         if st.button("🗑️ Eliminar Registo", key="delete_button"):
             if delete_file(selected_file):

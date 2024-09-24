@@ -129,7 +129,7 @@ def analyze_data(dados_lidos, key_suffix):
     st.write(f"**Qtd.M3 Total Toros:** {dados_lidos['valor_2']}")
 
     # Converter dados dos troncos em DataFrame
-    colunas_troncos = ['Nº Tronco', 'Quantidade', 'Medida']
+    colunas_troncos = ['BOX', 'Quantidade', 'M3']
     df_troncos = pd.DataFrame(dados_lidos['dados_troncos'], columns=colunas_troncos)
 
     # Exibir DataFrame dos troncos

@@ -65,50 +65,58 @@ def delete_file(filename):
     return False
 
 # Função atualizada para ler ficheiros com novo formato
-
 def ler_ficheiro_txt(file):
-    # Inicializar variáveis
-    dados_troncos = []
-    metadados = {}
+    try:
+        # Verificar se o arquivo é de tipo BytesIO
+        if isinstance(file, io.BytesIO):
+            content = file.getvalue().decode('utf-8')
+        else:
+            content = file.read().decode('utf-8')  # Isso pode variar dependendo da versão do streamlit
 
-    # Ler o conteúdo do ficheiro
-    content = file.read().decode('utf-8')  # Mudança aqui para `read()` ao invés de `getvalue()`
-    linhas = content.split('\n')
+        # Inicializar variáveis
+        dados_troncos = []
+        metadados = {}
 
-    # Primeira linha: datas e horas
-    primeira_linha = linhas[0].strip().split('~')
-    data_inicio, hora_inicio, data_fim, hora_fim = primeira_linha
+        linhas = content.split('\n')
 
-    # Segunda linha: valores numéricos
-    segunda_linha = linhas[1].strip().split('~')
-    valor_1, valor_2 = segunda_linha[:2]  # Aqui temos dois valores
+        # Primeira linha: datas e horas
+        primeira_linha = linhas[0].strip().split('~')
+        data_inicio, hora_inicio, data_fim, hora_fim = primeira_linha
 
-    # Linhas de troncos (a partir da terceira linha até encontrar metadados)
-    for linha in linhas[2:]:
-        linha = linha.strip()
-        if not linha or ":" in linha:
-            # Parar ao encontrar uma linha que contém metadados (contém ":")
-            break
-        colunas = linha.split('~')
-        if len(colunas) >= 3:
-            dados_troncos.append(colunas[:3])
+        # Segunda linha: valores numéricos
+        segunda_linha = linhas[1].strip().split('~')
+        valor_1, valor_2 = segunda_linha[:2]  # Aqui temos dois valores
 
-    # Metadados (linhas com ":")
-    for linha in linhas[len(dados_troncos) + 2:]:
-        if ":" in linha:
-            chave, valor = linha.split(":")
-            metadados[chave.strip()] = valor.strip()
+        # Linhas de troncos (a partir da terceira linha até encontrar metadados)
+        for linha in linhas[2:]:
+            linha = linha.strip()
+            if not linha or ":" in linha:
+                # Parar ao encontrar uma linha que contém metadados (contém ":")
+                break
+            colunas = linha.split('~')
+            if len(colunas) >= 3:
+                dados_troncos.append(colunas[:3])
 
-    return {
-        "data_inicio": data_inicio,
-        "hora_inicio": hora_inicio,
-        "data_fim": data_fim,
-        "hora_fim": hora_fim,
-        "valor_1": valor_1,
-        "valor_2": valor_2,
-        "dados_troncos": dados_troncos,
-        "metadados": metadados
-    }
+        # Metadados (linhas com ":")
+        for linha in linhas[len(dados_troncos) + 2:]:
+            if ":" in linha:
+                chave, valor = linha.split(":")
+                metadados[chave.strip()] = valor.strip()
+
+        return {
+            "data_inicio": data_inicio,
+            "hora_inicio": hora_inicio,
+            "data_fim": data_fim,
+            "hora_fim": hora_fim,
+            "valor_1": valor_1,
+            "valor_2": valor_2,
+            "dados_troncos": dados_troncos,
+            "metadados": metadados
+        }
+
+    except Exception as e:
+        st.error(f"Erro ao ler o ficheiro: {e}")
+        return None
 
 # Função de análise adaptada
 def analyze_data(dados_lidos, key_suffix):

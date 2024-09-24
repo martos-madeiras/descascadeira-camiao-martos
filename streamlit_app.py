@@ -71,7 +71,7 @@ def ler_ficheiro_txt(file):
     metadados = {}
 
     # Ler o conteúdo do ficheiro
-    content = file.getvalue().decode('utf-8')
+    content = file.read().decode('utf-8')  # Mudança aqui para `read()` ao invés de `getvalue()`
     linhas = content.split('\n')
 
     # Primeira linha: datas e horas

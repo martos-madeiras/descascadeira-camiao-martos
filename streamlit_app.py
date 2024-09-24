@@ -65,6 +65,7 @@ def delete_file(filename):
     return False
 
 # Função atualizada para ler ficheiros com novo formato
+
 def ler_ficheiro_txt(file):
     # Inicializar variáveis
     dados_troncos = []

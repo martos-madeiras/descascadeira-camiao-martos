@@ -126,11 +126,11 @@ def analyze_data(dados_lidos, key_suffix):
     st.write(f"**Data de Fim:** {dados_lidos['data_fim']} {dados_lidos['hora_fim']}")
     
     # Exibir os dois valores adicionais
-    st.write(f"**Valor 1:** {dados_lidos['valor_1']}")
-    st.write(f"**Valor 2:** {dados_lidos['valor_2']}")
+    st.write(f"**Qtd Total:** {dados_lidos['valor_1']}")
+    st.write(f"**Qtd Total M3:** {dados_lidos['valor_2']}")
 
     # Converter dados dos troncos em DataFrame
-    colunas_troncos = ['Nº Tronco', 'Quantidade', 'Medida']
+    colunas_troncos = ['Box', 'Quantidade', 'M3']
     df_troncos = pd.DataFrame(dados_lidos['dados_troncos'], columns=colunas_troncos)
 
     # Exibir DataFrame dos troncos

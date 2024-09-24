@@ -119,22 +119,33 @@ def ler_ficheiro_txt(file):
         st.error(f"Erro ao ler o ficheiro: {e}")
         return None
 # Função de análise adaptada
+# Função de análise adaptada
 def analyze_data(dados_lidos, key_suffix):
     # Exibir informações de data e hora
     st.write(f"**Data de Início:** {dados_lidos['data_inicio']} {dados_lidos['hora_inicio']}")
     st.write(f"**Data de Fim:** {dados_lidos['data_fim']} {dados_lidos['hora_fim']}")
     
     # Exibir os dois valores adicionais
-    total_troncos = df_troncos['Quantidade'].astype(int).sum()
-    st.write(f"**Qtd.M3 Total Toros:** {dados_lidos['valor_2']}")
+    st.write(f"**Valor 1:** {dados_lidos['valor_1']}")
+    st.write(f"**Valor 2:** {dados_lidos['valor_2']}")
 
     # Converter dados dos troncos em DataFrame
-    colunas_troncos = ['BOX', 'Quantidade', 'M3']
+    colunas_troncos = ['Nº Tronco', 'Quantidade', 'Medida']
     df_troncos = pd.DataFrame(dados_lidos['dados_troncos'], columns=colunas_troncos)
 
     # Exibir DataFrame dos troncos
     st.subheader("Dados dos Troncos")
     st.dataframe(df_troncos)
+
+    # Exibir metadados
+    st.subheader("Metadados")
+    for chave, valor in dados_lidos['metadados'].items():
+        st.write(f"**{chave}:** {valor}")
+
+    # Cálculos adicionais podem ser feitos com os dados do DataFrame `df_troncos`
+    # por exemplo, sumarizar a quantidade total de troncos
+    total_troncos = df_troncos['Quantidade'].astype(int).sum()
+    st.write(f"**Total de Troncos:** {total_troncos}")
 
 
 # Estrutura de tabs e funcionalidade

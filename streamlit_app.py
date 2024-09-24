@@ -136,11 +136,6 @@ def analyze_data(dados_lidos, key_suffix):
     st.subheader("Dados dos Troncos")
     st.dataframe(df_troncos)
 
-    # Exibir metadados
-    st.subheader("Metadados")
-    for chave, valor in dados_lidos['metadados'].items():
-        st.write(f"**{chave}:** {valor}")
-
     # Cálculos adicionais podem ser feitos com os dados do DataFrame `df_troncos`
     # por exemplo, sumarizar a quantidade total de troncos
     total_troncos = df_troncos['Quantidade'].astype(int).sum()

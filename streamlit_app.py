@@ -164,7 +164,7 @@ with tab1:
         st.subheader(f"Análise do arquivo carregado: {uploaded_file.name}")
         df = analyze_data(dados_lidos, "upload")
         
-      output = io.BytesIO()
+output = io.BytesIO()
 
 # Certifique-se de que df foi corretamente retornado da função analyze_data
 if df is not None and not df.empty:

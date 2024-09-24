@@ -67,11 +67,12 @@ def delete_file(filename):
 # Função atualizada para ler ficheiros com novo formato
 def ler_ficheiro_txt(file):
     try:
-        # Verificar se o arquivo é de tipo BytesIO
-        if isinstance(file, io.BytesIO):
+        # Tentar ler o conteúdo com 'utf-8' primeiro
+        try:
             content = file.getvalue().decode('utf-8')
-        else:
-            content = file.read().decode('utf-8')  # Isso pode variar dependendo da versão do streamlit
+        except UnicodeDecodeError:
+            # Se falhar, tentar com 'ISO-8859-1' ou 'Windows-1252'
+            content = file.getvalue().decode('ISO-8859-1')
 
         # Inicializar variáveis
         dados_troncos = []
@@ -117,7 +118,6 @@ def ler_ficheiro_txt(file):
     except Exception as e:
         st.error(f"Erro ao ler o ficheiro: {e}")
         return None
-
 # Função de análise adaptada
 def analyze_data(dados_lidos, key_suffix):
     # Exibir informações de data e hora

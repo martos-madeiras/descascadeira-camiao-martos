@@ -147,7 +147,7 @@ def analyze_data(dados_lidos, key_suffix):
     st.write(f"**Total de Troncos:** {total_troncos}")
 
 # Estrutura de tabs e funcionalidade
-st.title('Dashboard - Descascadeira - Camião')
+st.title('Dashboard Descascadeira-Camião')
 
 tab1, tab2 = st.tabs(["Carregar Novo Ficheiro", "Arquivo de Ficheiros"])
 

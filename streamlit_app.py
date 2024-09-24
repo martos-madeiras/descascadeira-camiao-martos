@@ -125,7 +125,7 @@ def analyze_data(dados_lidos, key_suffix):
     st.write(f"**Data de Fim:** {dados_lidos['data_fim']} {dados_lidos['hora_fim']}")
     
     # Exibir os dois valores adicionais
-    st.write(f"**Qtd.Total Toros:** {dados_lidos['valor_1']}")
+    total_troncos = df_troncos['Quantidade'].astype(int).sum()
     st.write(f"**Qtd.M3 Total Toros:** {dados_lidos['valor_2']}")
 
     # Converter dados dos troncos em DataFrame
@@ -136,10 +136,6 @@ def analyze_data(dados_lidos, key_suffix):
     st.subheader("Dados dos Troncos")
     st.dataframe(df_troncos)
 
-    # Cálculos adicionais podem ser feitos com os dados do DataFrame `df_troncos`
-    # por exemplo, sumarizar a quantidade total de troncos
-    total_troncos = df_troncos['Quantidade'].astype(int).sum()
-    st.write(f"**Total de Troncos:** {total_troncos}")
 
 # Estrutura de tabs e funcionalidade
 st.title('Dashboard Descascadeira-Camião')
